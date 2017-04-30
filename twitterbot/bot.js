@@ -176,7 +176,7 @@ function parseUserSubmission(textString){
 
 	var fileString = year+'\n'+month+'\n'+day+'\n'+hour+'\n'+minute+'\n'+second;
 	var b64 = fs.writeFileSync(dateFile, fileString);
-	return mDate.format('YYYY-MM-DD hh:mm:ss a')
+	return mDate.format('YYYY-MM-DD\nH:mm:ss');
 }
 
 
