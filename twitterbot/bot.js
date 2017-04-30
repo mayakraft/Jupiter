@@ -184,28 +184,27 @@ function tweetEvent(eventMsg){
 
 
 function tweetReplyTo(tweetReplyID, tweetTextContent){
-	// console.log("convert end");
-	var imageFile = imagemakerFolder + 'images/animated.gif';
-	var params = {
-		encoding: 'base64'
-	};
-	var b64 = fs.readFileSync(imageFile, params);
-	T.post('media/upload', { media_data: b64}, uploaded);
+	var tweet = {};
+	// var imageFile = imagemakerFolder + 'images/animated.gif';
+	// var params = {
+	// 	encoding: 'base64'
+	// };
+	// var b64 = fs.readFileSync(imageFile, params);
+	// T.post('media/upload', { media_data: b64}, uploaded);
 
-	function uploaded(err, data, response){
-		// console.log('image uploaded');
-		// media has been uploaded, now we can tweet with the ID of the image
-		var id = data.media_id_string;
-		var tweet = {
-			status: tweetTextContent,
-			media_ids: [id]
-		}
+	// function uploaded(err, data, response){
+	// 	// media has been uploaded, now we can tweet with the ID of the image
+	// 	var id = data.media_id_string;
+	// 	var tweet = {
+	// 		status: tweetTextContent,
+	// 		media_ids: [id]
+	// 	}
 		if(tweetReplyID != undefined){
 			console.log('this is a tweet response to someone ' + tweetReplyID);
 			tweet = {
 				status: tweetTextContent,
-				in_reply_to_status_id: tweetReplyID,
-				media_ids: [id]
+	//			media_ids: [id],
+				in_reply_to_status_id: tweetReplyID
 			}
 			console.log('augmented the tweet body');
 		}
@@ -220,7 +219,6 @@ function tweetReplyTo(tweetReplyID, tweetTextContent){
 				fs.exists(imageFile, function(exists) {
 					if(exists) fs.unlink(imageFile);
 				});
-				// console.log(data);
 			}
 		};
 	}
