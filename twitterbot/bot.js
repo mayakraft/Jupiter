@@ -155,8 +155,8 @@ function tweetAtMeEvent(eventMsg){
 			// console.log('Attepting IPA of ' + tweetContent);
 			// IPAFromWord(tweetContent, from, tweetReplyID);
 		// }
-		var newTweet = '@' + from + ' ' + tweetContent;
-		tweetReplyTo(newTweet, eventMsg);
+		// var newTweet = '@' + from + ' ' + tweetContent;
+		tweetReplyTo(tweetContent, eventMsg);
 	}
 
 	// console.log("event");
@@ -180,11 +180,15 @@ var imagemakerReaderFolder = 'application.reader.linux64/';
 
 
 function tweetReplyTo(tweetTextContent, eventMsg){
+	console.log("tweetReplyTo");
 	var tweet = {};
 	var imageFile = imagemakerReaderFolder + 'images/output.png';
 	var dateFile = imagemakerReaderFolder + 'date.txt';
 
+	console.log("dateString");
 	var dateString = bestGuessForUserSubmission(tweetTextContent);
+	console.log(dateString);
+
 
 	var b64 = fs.writeFileSync(imagemakerReaderFolder + "date.txt", dateString);
 
@@ -195,6 +199,7 @@ function tweetReplyTo(tweetTextContent, eventMsg){
 	exec(cmd, processingFinished);
 
 	function processingFinished(error, stdout, stderr){
+		console.log("processingFinished");
 		if(error){ console.log(error); return; }
 
 		var params = { encoding: 'base64' };
@@ -203,10 +208,12 @@ function tweetReplyTo(tweetTextContent, eventMsg){
 		T.post('media/upload', { media_data: b64}, imageDidUpload);
 
 		function imageDidUpload(err, data, response){
+			console.log("imageDidUpload");
 			// media has been uploaded, now we can tweet with the ID of the image
 			var id = data.media_id_string;
+			var replyTweetString = '@' + eventMsg.user.screen_name + ' ' + tweetTextContent;
 			var tweet = {
-				status: tweetTextContent,
+				status: replyTweetString,
 				in_reply_to_status_id: eventMsg.id_str,
 				media_ids: [id]
 			}
