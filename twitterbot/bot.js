@@ -158,13 +158,14 @@ function tweetAtMeEvent(eventMsg){
 		// var newTweet = '@' + from + ' ' + tweetContent;
 		tweetReplyTo(tweetContent, eventMsg);
 	}
-
-	// console.log("event");
-	// var name = eventMsg.source.name;
-	// var screenName = eventMsg.source.screen_name;
 }
 
-function bestGuessForUserSubmission(textString){
+var imagemakerReaderFolder = 'application.reader.linux64/';
+// var imagemakerReaderFolder = 'application.reader.macosx/';
+var dateFile = imagemakerReaderFolder + 'date.txt';
+
+
+function parseUserSubmission(textString){
 	var mDate = moment.unix(textString);//.utc();
 	var year = mDate.year();
 	var month = mDate.month() + 1;  // January start at 1
@@ -172,25 +173,19 @@ function bestGuessForUserSubmission(textString){
 	var hour = mDate.hour();
 	var minute = mDate.minute();
 	var second = mDate.second();
-	return year+'\n'+month+'\n'+day+'\n'+hour+'\n'+minute+'\n'+second;
-}
 
-var imagemakerReaderFolder = 'application.reader.linux64/';
-// var imagemakerReaderFolder = 'application.reader.macosx/';
+	var fileString = year+'\n'+month+'\n'+day+'\n'+hour+'\n'+minute+'\n'+second;
+	var b64 = fs.writeFileSync(dateFile, fileString);
+	return mDate.format('YYYY-MM-DD hh:mm:ss a')
+}
 
 
 function tweetReplyTo(tweetTextContent, eventMsg){
 	console.log("tweetReplyTo");
 	var tweet = {};
 	var imageFile = imagemakerReaderFolder + 'images/output.png';
-	var dateFile = imagemakerReaderFolder + 'date.txt';
 
-	console.log("dateString");
-	var dateString = bestGuessForUserSubmission(tweetTextContent);
-	console.log(dateString);
-
-
-	var b64 = fs.writeFileSync(imagemakerReaderFolder + "date.txt", dateString);
+	var dateString = parseUserSubmission(tweetTextContent);
 
 	// linux executable:
 	var cmd = '`pwd`/' + imagemakerReaderFolder + 'JupiterMoons_reader';
@@ -211,7 +206,7 @@ function tweetReplyTo(tweetTextContent, eventMsg){
 			console.log("imageDidUpload");
 			// media has been uploaded, now we can tweet with the ID of the image
 			var id = data.media_id_string;
-			var replyTweetString = '@' + eventMsg.user.screen_name + ' ' + tweetTextContent;
+			var replyTweetString = '@' + eventMsg.user.screen_name + ' ' + dateString;
 			var tweet = {
 				status: replyTweetString,
 				in_reply_to_status_id: eventMsg.id_str,
