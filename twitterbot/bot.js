@@ -1,48 +1,42 @@
 // this bot's twitter handle:
 var TWITTER_HANDLE = 'jupiternow';
 
-
 var Twit = require('twit');
-//get keys from the other file
-var config = require('./config');
-// start twit with keys
-var T = new Twit(config);
 var exec = require('child_process').exec;
 var fs = require('fs');
 var moment = require('moment');
+var config = require('./config');  //get keys from the other file
 
+// start twit with keys
+var T = new Twit(config);
 
 /////////////////////////////////////////////////////////
 ////////////////     TERMINAL     ///////////////////////
 /////////////////////////////////////////////////////////
 
+console.log("Starting Twitter Bot..");
 
 // var imagemakerFolder = 'application.macosx/';
 var imagemakerFolder = 'application.linux64/';
 
-console.log("Starting Twitter Bot..");
-tweetImage();
-setInterval(tweetImage, 1000 * 60 * 60 * 6);  // 6 hours
+// tweetForecastAnim();
+// setInterval(tweetForecastAnim, 1000 * 60 * 60 * 6);  // 6 hours
 
 
-
-function tweetImage(tweetTextContent, tweetReplyID){
-	if(tweetTextContent == undefined)
-		tweetTextContent = ' ';
-
+function tweetForecastAnim(){
 	var startDate = moment().utc().format('D MMMM YYYY');
-
 	// var startTime = moment().format('YYYY-MM-DD hh:mm:ss a')
 	// var endTime = moment().add(6,'hours').format('YYYY-MM-DD hh:mm:ss a')
-	var startTime = moment().utc().format('H:mm')
-	var endTime = moment().utc().add(6,'hours').format('H:mm')
+	var startTime = moment().utc().format('H:mm');
+	var endTime = moment().utc().add(6,'hours').format('H:mm');
+
+	var tweetTextContent = ' ';
 	if(moment().utc().date() == moment().utc().add(6,'hours').date()){
 		tweetTextContent = startDate + "\nfrom " + startTime + " to " + endTime;
 	} else{
 		tweetTextContent = startDate + "\nfrom " + startTime + " to tomorrow at " + endTime;
 	}
 	console.log( tweetTextContent );
-
 
 	// UNCOMPILED PROCESSING SKETCH
 	// var cmd = 'processing-java --sketch=`pwd`/imagemaker --run';
@@ -53,72 +47,44 @@ function tweetImage(tweetTextContent, tweetReplyID){
 	var cmd = '`pwd`/' + imagemakerFolder + 'JovianMoons';
 	// mac executable:
 	// var cmd = 'open ' + imagemakerFolder + 'JovianMoons.app';
-	exec(cmd, processing);
+	exec(cmd, processingFinished);
 
-	function processing(error, stdout, stderr){
-		if(error){
-			console.log(error);
-			if(stdout){
-				console.log(stdout);
-			}
-			if(stderr){
-				console.log(stderr);
-			}
-			return;
-		}
+	function processingFinished(error, stdout, stderr){
+		if(error){ console.log(error); return; }
 
 		// convert -delay 3 -loop 0 *.png animated.gif
-		// console.log("converting image");
 		var cmd = 'convert -delay 3 -loop 0 ' + imagemakerFolder + 'images/*.png ' + imagemakerFolder + 'images/animated.gif';
-		exec(cmd, readyToPostImage);
+		exec(cmd, uploadAndTweetImage);
 
-		function readyToPostImage(){
-			// console.log("convert end");
+		function uploadAndTweetImage(){
 			var imageFile = imagemakerFolder + 'images/animated.gif';
-			var params = {
-				encoding: 'base64'
-			};
+			var params = { encoding: 'base64' };
 			var b64 = fs.readFileSync(imageFile, params);
-			T.post('media/upload', { media_data: b64}, uploaded);
+			T.post('media/upload', { media_data: b64}, imageDidUpload);
 
-			function uploaded(err, data, response){
-				// console.log('image uploaded');
+			function imageDidUpload(err, data, response){
 				// media has been uploaded, now we can tweet with the ID of the image
 				var id = data.media_id_string;
 				var tweet = {
 					status: tweetTextContent,
 					media_ids: [id]
 				}
-				if(tweetReplyID != undefined){
-					console.log('this is a tweet response to someone ' + tweetReplyID);
-					tweet = {
-						status: tweetTextContent,
-						in_reply_to_status_id: tweetReplyID,
-						media_ids: [id]
-					}
-					console.log('augmented the tweet body');
-				}
 				T.post('statuses/update', tweet, tweeted);
-				// console.log(data);
 				function tweeted(err, data, response) {
-					if(err){
-						console.log('ERROR: ' + err);
-					}
+					if(err){ console.log('ERROR: ' + err); }
 					else{
 						console.log('tweet posted');
 						fs.exists(imageFile, function(exists) {
 							if(exists) fs.unlink(imageFile);
 						});
-						// console.log(data);
 					}
 				};
 			}
 		}
-
-
-
 	}
 }
+
+
 
 
 
@@ -153,29 +119,113 @@ function processing() {
 /////////////////////////////////////////////////////////
 ////////////////      STREAM      ///////////////////////
 /////////////////////////////////////////////////////////
-/*
+
 var stream = T.stream('user');
 
-stream.on('follow', function (eventMsg){
-	var name = eventMsg.source.name;
-	var screenName = eventMsg.source.screen_name;
-});
-stream.on('limit', function (limitMessage) { console.log('limit !!'); });
-stream.on('favorite', function (eventMsg) { console.log('got a fav'); });
-stream.on('quoted_tweet', function (eventMsg) {});
-stream.on('retweeted_retweet', function (eventMsg) {});
+// stream.on('follow', function (eventMsg){
+// 	var name = eventMsg.source.name;
+// 	var screenName = eventMsg.source.screen_name;
+// });
+// stream.on('limit', function (limitMessage) { console.log('limit !!'); });
+// stream.on('favorite', function (eventMsg) { console.log('got a fav'); });
+// stream.on('quoted_tweet', function (eventMsg) {});
+// stream.on('retweeted_retweet', function (eventMsg) {});
+
 stream.on('tweet', function (eventMsg) {
 	var inReply = eventMsg.in_reply_to_screen_name;
 	var text = eventMsg.text;
 	var from = eventMsg.user.screen_name;
 
 	if(inReply === TWITTER_HANDLE){
+		console.log("matching: inReply === TWITTER_HANDLE")
 		console.log(from + ' sent us a tweet: "' + text + '"');
-		var newTweet = '@' + from + ' here\'s some music';
-		tweetIt(newTweet);
+	} else{	
+		console.log("NOT matching: inReply === TWITTER_HANDLE")
+		console.log(inReply);
+		console.log(text);
+		console.log(from);
+		console.log(eventMsg);
 	}
+	tweetEvent(eventMsg);
 });
-*/
+
+
+
+function tweetEvent(eventMsg){
+	var replyto = eventMsg.in_reply_to_screen_name;
+	var text = eventMsg.text;
+	var from = eventMsg.user.screen_name;
+	var tweetReplyID = eventMsg.id_str;
+
+	// if(replyto === TWITTER_HANDLE){
+		console.log(from + ' sent us a tweet: "' + text + '"');
+		var tweetContent = text.toLowerCase().replace('@'+TWITTER_HANDLE.toLowerCase(),'');
+		// tweetContent = tweetContent.replace('@'+TWITTER_HANDLE,'');
+		tweetContent = tweetContent.replace(' ', '');
+
+		// if(tweetContent === '' || tweetContent === ' '){
+			// console.log('Attepting IPA of ' + from);
+			// IPAFromWord(from, from, tweetReplyID);
+		// }
+		// else{
+			// console.log('Attepting IPA of ' + tweetContent);
+			// IPAFromWord(tweetContent, from, tweetReplyID);
+		// }
+		var newTweet = '@' + from + ' ' + tweetContent;
+		tweetReplyTo(tweetReplyID, tweetContent);
+	// }
+
+	// console.log("event");
+	// var name = eventMsg.source.name;
+	// var screenName = eventMsg.source.screen_name;
+}
+
+
+
+
+function tweetReplyTo(tweetReplyID, tweetTextContent){
+	// console.log("convert end");
+	var imageFile = imagemakerFolder + 'images/animated.gif';
+	var params = {
+		encoding: 'base64'
+	};
+	var b64 = fs.readFileSync(imageFile, params);
+	T.post('media/upload', { media_data: b64}, uploaded);
+
+	function uploaded(err, data, response){
+		// console.log('image uploaded');
+		// media has been uploaded, now we can tweet with the ID of the image
+		var id = data.media_id_string;
+		var tweet = {
+			status: tweetTextContent,
+			media_ids: [id]
+		}
+		if(tweetReplyID != undefined){
+			console.log('this is a tweet response to someone ' + tweetReplyID);
+			tweet = {
+				status: tweetTextContent,
+				in_reply_to_status_id: tweetReplyID,
+				media_ids: [id]
+			}
+			console.log('augmented the tweet body');
+		}
+		T.post('statuses/update', tweet, tweeted);
+		// console.log(data);
+		function tweeted(err, data, response) {
+			if(err){
+				console.log('ERROR: ' + err);
+			}
+			else{
+				console.log('tweet posted');
+				fs.exists(imageFile, function(exists) {
+					if(exists) fs.unlink(imageFile);
+				});
+				// console.log(data);
+			}
+		};
+	}
+}
+
 /////////////////////////////////////////////////////////
 ////////////////      TWEET       ///////////////////////
 /////////////////////////////////////////////////////////
