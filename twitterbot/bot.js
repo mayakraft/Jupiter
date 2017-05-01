@@ -123,8 +123,10 @@ function tweetAtMeEvent(eventMsg){
 }
 
 function parseUserSubmission(textString){
-	var mDate = moment.unix(textString);//.utc();
-	if(mDate == undefined){
+	var mDate;
+	if(moment.unix(textString).isValid()){
+		mDate = moment.unix(textString);//.utc();
+	} else{
 		mDate = moment().utc();
 	}
 	var year = mDate.year();
@@ -136,7 +138,7 @@ function parseUserSubmission(textString){
 
 	var fileString = year+'\n'+month+'\n'+day+'\n'+hour+'\n'+minute+'\n'+second;
 	var b64 = fs.writeFileSync(dateFile, fileString);
-	return mDate.format('YYYY-MM-DD\nH:mm:ss');
+	return mDate.format('H:mm') + ' UTC on ' + mDate.format('D MMMM YYYY');
 }
 
 
@@ -144,7 +146,6 @@ function tweetReplyTo(tweetTextContent, eventMsg){
 	console.log("tweetReplyTo");
 	var tweet = {};
 	var imageFile = folderPhotoApp + 'images/output.png';
-		// if(tweetContent === '' || tweetContent === ' '){
 
 	var dateString = parseUserSubmission(tweetTextContent);
 
@@ -187,7 +188,6 @@ function tweetReplyTo(tweetTextContent, eventMsg){
 		}
 	}
 }
-
 
 function tweetSimpleReplyTo(tweetTextContent, eventMsg){
 	var tweet = {};

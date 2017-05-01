@@ -20,12 +20,12 @@ void setup(){
   
   // 1. UNCOMMENT FOR IMAGE GENERATION
   for(int imageNumber = 0; imageNumber < 90; imageNumber++){
-  imageWithDate(date);
-  String filename = "images/output" + nf(imageNumber, 4) + ".png";
-  save(filename);
-  // increment
-  date.minute += 4;
-  date.correctDates();
+    imageWithDate(date);
+    String filename = "images/output" + nf(imageNumber, 4) + ".png";
+    save(filename);
+    // increment
+    date.minute += 4;
+    date.correctDates();
   }
   exit();
   // 1. /////////////////////////////////
