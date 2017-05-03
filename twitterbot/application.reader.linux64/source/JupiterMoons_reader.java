@@ -49,6 +49,11 @@ public void setup(){
   date.hour += TIME_ZONE_ADJUST; // if server is elsewhere, move time to UTC
   date.correctDates();  // always call correctDates when you manually change time
   
+  // CALCULATE ZOOM
+  Moons moons = new Moons(date.year, date.month, date.day, date.hour, date.minute, date.second);
+  ZOOM = 350/moons.zoom() - 2;
+  textSize(14 + (ZOOM-13)*0.5f );
+  
   imageWithDate(date);
   save(filename);
   exit();
@@ -61,14 +66,23 @@ public void imageWithDate(Date date){
   float centerY = height * 0.5f;
   // draw
   background(0);
+  //text(year + " " + month + " " + day + " " + hour + ":" + minute, centerX - 50, 100);
+  for(int i = 0; i < 4; i++){
+    if(moons.inFront[i] == false){
+      fill(moons.red[i], moons.green[i], moons.blue[i]);
+      ellipse(centerX - moons.x[i]*ZOOM, centerY + moons.y[i]*ZOOM, .15f*ZOOM, .15f*ZOOM);
+      text(moons.names[i], centerX - moons.x[i]*ZOOM - textWidth(moons.names[i])*0.5f, centerY + moons.y[i]*ZOOM + 2*ZOOM);
+    }
+  }
   fill(255);
   noStroke();
   image(jupiterImage, centerX - ZOOM*2.0f*0.5f, centerY - ZOOM*2.0f*0.5f, ZOOM*2.0f, ZOOM*2.0f);
-  //text(date.year + " " + date.month + " " + date.day + " " + date.hour + ":" + date.minute, centerX - 50, 100);
   for(int i = 0; i < 4; i++){
-    fill(moons.red[i], moons.green[i], moons.blue[i]);
-    ellipse(centerX - moons.x[i]*ZOOM, centerY + moons.y[i]*ZOOM, 3, 3);
-    text(moons.names[i], centerX - moons.x[i]*ZOOM - textWidth(moons.names[i])*0.5f, centerY + moons.y[i]*ZOOM + 50);
+    if(moons.inFront[i] == true){
+      fill(moons.red[i], moons.green[i], moons.blue[i]);
+      ellipse(centerX - moons.x[i]*ZOOM, centerY + moons.y[i]*ZOOM, .15f*ZOOM, .15f*ZOOM);
+      text(moons.names[i], centerX - moons.x[i]*ZOOM - textWidth(moons.names[i])*0.5f, centerY + moons.y[i]*ZOOM + 2*ZOOM);
+    }
   }
 }
 class Date{
@@ -103,6 +117,8 @@ float D2R = 0.017453292519943f;
 class Moons{
 
   String[] names = { "Io", "Europa", "Ganymede", "Callisto" };
+  
+  boolean[] inFront = {false, false, false, false};
 
   float[] x = new float[4];
   float[] y = new float[4];
@@ -110,6 +126,14 @@ class Moons{
   int[] red = {255, 193, 156, 138};
   int[] green = {233, 142, 144, 118};
   int[] blue = {122, 80, 127, 85};
+  
+  public float zoom(){
+    float largest = 0.0f;
+    for(int i = 0; i < 4; i++){
+      if(abs(x[i]) > largest) largest = abs(x[i]);
+    }
+    return largest;
+  }
 
   public float J2000DaysFromUTCTime(int yr, int mon, int d, int hr, int min, int sec){
     float wholePart = 367*yr-floor(7*(yr+floor((mon+9)/12.0f))/4.0f)+floor(275*mon/9.0f)+d-730531.5f;
@@ -163,6 +187,14 @@ class Moons{
       x[i] = -radius[i] * sin(u[i]*D2R);
       y[i] = radius[i] * cos(u[i]*D2R)*sin(De*D2R);
     }  
+    // check if things are in front of jupiter
+    //between 90 and 270
+    for(int i = 0; i < 4; i++){
+      if(u[i] > 360){
+        while(u[i] > 360) u[i] -= 360;
+      }
+      if(u[i] < 90 || u[i] > 270) inFront[i] = true;
+    }
   }
 }
   public void settings() {  size(800, 400); }

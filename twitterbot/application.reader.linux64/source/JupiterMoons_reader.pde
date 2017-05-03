@@ -33,6 +33,11 @@ void setup(){
   date.hour += TIME_ZONE_ADJUST; // if server is elsewhere, move time to UTC
   date.correctDates();  // always call correctDates when you manually change time
   
+  // CALCULATE ZOOM
+  Moons moons = new Moons(date.year, date.month, date.day, date.hour, date.minute, date.second);
+  ZOOM = 350/moons.zoom() - 2;
+  textSize(14 + (ZOOM-13)*0.5 );
+  
   imageWithDate(date);
   save(filename);
   exit();
@@ -45,13 +50,22 @@ void imageWithDate(Date date){
   float centerY = height * 0.5;
   // draw
   background(0);
+  //text(year + " " + month + " " + day + " " + hour + ":" + minute, centerX - 50, 100);
+  for(int i = 0; i < 4; i++){
+    if(moons.inFront[i] == false){
+      fill(moons.red[i], moons.green[i], moons.blue[i]);
+      ellipse(centerX - moons.x[i]*ZOOM, centerY + moons.y[i]*ZOOM, .15*ZOOM, .15*ZOOM);
+      text(moons.names[i], centerX - moons.x[i]*ZOOM - textWidth(moons.names[i])*0.5, centerY + moons.y[i]*ZOOM + 2*ZOOM);
+    }
+  }
   fill(255);
   noStroke();
   image(jupiterImage, centerX - ZOOM*2.0*0.5, centerY - ZOOM*2.0*0.5, ZOOM*2.0, ZOOM*2.0);
-  //text(date.year + " " + date.month + " " + date.day + " " + date.hour + ":" + date.minute, centerX - 50, 100);
   for(int i = 0; i < 4; i++){
-    fill(moons.red[i], moons.green[i], moons.blue[i]);
-    ellipse(centerX - moons.x[i]*ZOOM, centerY + moons.y[i]*ZOOM, 3, 3);
-    text(moons.names[i], centerX - moons.x[i]*ZOOM - textWidth(moons.names[i])*0.5, centerY + moons.y[i]*ZOOM + 50);
+    if(moons.inFront[i] == true){
+      fill(moons.red[i], moons.green[i], moons.blue[i]);
+      ellipse(centerX - moons.x[i]*ZOOM, centerY + moons.y[i]*ZOOM, .15*ZOOM, .15*ZOOM);
+      text(moons.names[i], centerX - moons.x[i]*ZOOM - textWidth(moons.names[i])*0.5, centerY + moons.y[i]*ZOOM + 2*ZOOM);
+    }
   }
 }
