@@ -10,7 +10,7 @@ var config = require('./config');  //get keys from the other file
 // start twit with keys
 var T = new Twit(config);
 
-// 2 applications: 1 makes an animation of the next 6 hours into a .gif
+// 2 applications: 1 makes an animation of the next n hours into a .gif
 // var folderAnimationApp = 'application.macosx/';
 var folderAnimationApp = 'application.linux64/';
 var animationAppName = 'JovianMoons';
@@ -26,16 +26,18 @@ var dateFile = folderPhotoApp + 'date.txt';
 
 console.log("Starting Twitter Bot..");
 
+var HOURINTERVAL = 6;  // 6 hours
+
 tweetForecastAnim();
-setInterval(tweetForecastAnim, 1000 * 60 * 60 * 6);  // 6 hours
+setInterval(tweetForecastAnim, 1000 * 60 * 60 * HOURINTERVAL);
 
 function tweetForecastAnim(){
 	var startDate = moment().utc().format('D MMMM YYYY');
 	var startTime = moment().utc().format('H:mm');
-	var endTime = moment().utc().add(6,'hours').format('H:mm');
+	var endTime = moment().utc().add(HOURINTERVAL,'hours').format('H:mm');
 
 	var tweetTextContent;
-	if(moment().utc().date() == moment().utc().add(6,'hours').date()){
+	if(moment().utc().date() == moment().utc().add(HOURINTERVAL,'hours').date()){
 		tweetTextContent = startDate + "\nfrom " + startTime + " to " + endTime;
 	} else{
 		tweetTextContent = startDate + "\nfrom " + startTime + " to tomorrow at " + endTime;

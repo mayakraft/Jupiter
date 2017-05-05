@@ -3,8 +3,8 @@
 // Robby Kraft
 
 // NOW TIME in Processing is this computers' time. Needs to be UTC
-//int TIME_ZONE_ADJUST = 4;  // adjusts New York back to UTC, for some reason it's 4 not 5
-int TIME_ZONE_ADJUST = 1;  // adjusts Spain to UTC
+int TIME_ZONE_ADJUST = 4;  // adjusts New York back to UTC, for some reason it's 4 not 5
+//int TIME_ZONE_ADJUST = 1;  // adjusts Spain to UTC
 
 float ZOOM = 14;
 
