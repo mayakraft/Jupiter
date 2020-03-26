@@ -20,7 +20,10 @@ const MakeFrame = function (date, frameNum) {
   svg.appendChild(Jupiter(date, frameNum).scale(2));
 
   // draw moons
-  chart.map((moon, i) => Roto(`src/svg/${moon.name}.svg`, date.unix())
+  chart.map((moon, i) => Roto(`src/svg/${moon.name}.svg`, {
+      t: date.unix(),
+      magnitude: 1,
+    })
       .translate(moon.x, moon.y)
       // .scale(moon.radius * 2))
       .scale(moon.radius * 4))

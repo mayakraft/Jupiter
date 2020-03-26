@@ -10,7 +10,8 @@ const makeTweetText = (startDate, endDate) => {
   // return `Jupiter from ${start} to ${end} UTC+0`;
   const start = startDate.format("h:mm a");
   const end = endDate.format("h:mm a");
-  return `Jupiter now, the next 5 hours (${start} - ${end} UTC+0)`;
+  const moon = "Io"
+  return `${moon} transit happening now`;
 }
 
 const Scene = function (startDate, endDate, frames) {

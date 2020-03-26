@@ -5,7 +5,10 @@ const { noise } = require("../lib/toolkit");
 const moment = require("moment");
 
 // t is a number. a seed for our noise function
-const Image = function (path, t) {
+// options must have
+//  .t the time
+//  .magnitude the magnitude of the noise
+const Image = function (path, options) {
   const xmlString = fs.readFileSync(path, "utf-8");
   const svg = SVG();
   svg.load(xmlString);
@@ -25,12 +28,12 @@ const Image = function (path, t) {
   const start = paths.map(p => p.get().map(el => el.values));
 
   paths.forEach((p,i) => {
-    var mag = 0.04;
+    var mag = 0.04 * options.magnitude;
     var speed = 0.01;
     var commands = p.get();
     commands.forEach((el, j) => {
       commands[j].values = start[i][j]
-        .map((n,k) => n + noise(speed*t + i*3 + j*0.3 + k*8) * mag)
+        .map((n,k) => n + noise(speed*options.t + i*3 + j*0.3 + k*8) * mag)
     });
     p.set(commands);
   });
