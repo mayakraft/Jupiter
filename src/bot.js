@@ -32,7 +32,7 @@ mkdir("./tmp/");
 // const endDate = moment(startDate).add(HOURINTERVAL, "hours");
 // Forecast(startDate, endDate, 60, sendTweet);
 
-const startDate = moment().utc().add(7, "hours");
+const startDate = moment().utc();
 // 30 Nov 2019 13:46
 // startDate.set('year', 2020);
 // startDate.set('month', 2); // december
@@ -61,11 +61,14 @@ const sendTweet = function (tweetInfo) {
     });
 };
 
+// Schedule.fill()
+
 console.log("Starting Twitter Bot..");
 console.log(startDate.format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
-Closeup(startDate, endDate, 120)
+Forecast(startDate, endDate, 120)
   // .then(sendTweet)
+  .then(a => console.log(a))
   .catch(error => {})
 
 // tomorrow detection

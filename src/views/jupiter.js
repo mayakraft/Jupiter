@@ -1,8 +1,8 @@
 const fs = require("fs");
 const SVG = require("rabbit-ear-svg");
-const Jupiter = require("../render/jupiter");
+const Jupiter = require("../draw/jupiter");
 const Ephemeris = require("../ephemeris/moons");
-const Roto = require("../render/roto");
+const Roto = require("../draw/roto");
 
 // the entire span of night time, for a certain city
 // map of places where jupiter is visible right now
@@ -17,10 +17,11 @@ const MakeFrame = function (date, frameNum) {
   const w = 2.5;
   const svg = SVG(-w, -w/2, w*2, w);
   svg.background("black");
-  svg.appendChild(Jupiter(date, frameNum).scale(2));
+  // svg.appendChild(Jupiter(date, frameNum).scale(2));
+  svg.appendChild(Jupiter(date, frameNum));
 
   // draw moons
-  chart.map((moon, i) => Roto(`src/svg/${moon.name}.svg`, {
+  chart.map((moon, i) => Roto(`./assets/${moon.name}.svg`, {
       t: date.unix() / 60,
       magnitude: 5,
     })

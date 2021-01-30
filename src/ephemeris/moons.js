@@ -1,5 +1,4 @@
-const J2000 = require("../dates/J2000");
-const Convert = require("../dates/convert");
+const J2000 = require("./J2000");
 
 const D2R = 0.017453292519943;
 const JPR_RAD = 69911;
@@ -12,7 +11,7 @@ const Moons = function (date) {
     { name: "Callisto", front: false, radius: 2410.3 / JPR_RAD },
   ];
 
-  const d = Convert(date);
+  const d = J2000.daysFromMoment(date);
 
   // JUPITER numbers
   const V = 172.74 + 0.00111588 * d;

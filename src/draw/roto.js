@@ -35,7 +35,8 @@ const Image = function (path, options) {
       commands[j].values = start[i][j]
         .map((n,k) => n + noise(speed*options.t + i*3 + j*0.3 + k*8) * mag)
     });
-    p.set(commands);
+    commands.forEach(c => p.addCommand(c));
+    // p.set(commands);
   });
 
   return g;

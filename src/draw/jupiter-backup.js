@@ -7,11 +7,11 @@ const Convert = require("../dates/convert");
 
 const Jupiter = function (date, frameNum) {
   if (frameNum == null) { frameNum = date.unix(); }
-  const jupiter = Roto("src/svg/jupiter-true.svg", {
+  const jupiter = Roto("./assets/jupiter-true.svg", {
     t: frameNum,
     magnitude: 0.8,
   });
-  const redSpot = Roto("src/svg/red-spot.svg", {
+  const redSpot = Roto("./assets/red-spot.svg", {
     t: frameNum * 2,
     magnitude: 0.6,
   });

@@ -9,10 +9,9 @@
   "author": "robby kraft",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.24.0",
-    "rabbit-ear-svg": "^0.2.0",
-    "svg2img": "^0.6.1",
-    "twit": "^2.2.11",
-    "xmldom": "^0.3.0"
+    "moment": "^2.29.1",
+    "rabbit-ear-svg": "^0.2.2",
+    "svg-to-png": "^4.0.0",
+    "twit": "^2.2.11"
   }
 }
