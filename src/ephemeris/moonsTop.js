@@ -56,9 +56,9 @@ const Moons = function (date) {
   for (let i = 0; i < 4; i += 1) {
     // x with a negative puts it into mirror-reversed view
     moons[i].x = radius[i] * Math.sin(u[i]*D2R);
-    moons[i].y = radius[i] * Math.cos(u[i]*D2R)*Math.sin(De*D2R);
+    moons[i].y = radius[i] * Math.cos(u[i]*D2R);//*Math.sin(De*D2R);
     moons[i].front = Math.cos(u[i]*D2R) > 0;
-  }  
+  }
   return moons;
 };
 
