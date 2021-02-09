@@ -12,8 +12,8 @@ const Closeup = require("./scenes/closeup");
 const DiagramTop = require("./scenes/diagramTop");
 // start twit with keys
 const T = new Twit(config);
-// is this still true? ...
-// right now this bot is displaying in mirror-reversed view.
+// is this still true? ...right now this bot is displaying in mirror-reversed view.
+
 const sendTweet = function (tweetInfo) {
   console.log(tweetInfo.text);
   uploadMedia(T, tweetInfo.media)
@@ -37,12 +37,18 @@ const date = moment().utc();
 console.log("Starting Twitter Bot..");
 console.log(date.format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
-DiagramTop(date, moment(date).add(12, "hours"), 240)
-// ElapsedTelescope(date, moment(date).add(12, "hours"), 480)
+ElapsedTelescope({
+  start: date,
+  end: moment(date).add(24, "hours"),
+  frames: 720,
+  labelMoons: true,
+  labelTime: true,
+})
+// DiagramTop(date, moment(date).add(12, "hours"), 240)
 // Closeup(date, moment(date).add(12, "hours"), 480)
-  // .then(filename => console.log(filename))
   .then(sendTweet)
   .catch(error => console.error(error))
 
 // tomorrow detection
  // if(moment().utc().date() == moment().utc().add(HOURINTERVAL,'hours').date()){}
+

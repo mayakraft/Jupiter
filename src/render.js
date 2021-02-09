@@ -9,21 +9,32 @@ const scene = (typeof params[0] === "string"
   ? parseInt(params[0])
   : 0);
 
-const date = (typeof params[1] === "string"
-  ? moment(params[1])
-  : moment.now());
+const date = moment().utc();
+// const date = (typeof params[1] === "string"
+//   ? moment(params[1])
+//   : moment.utc());
 
 const render = () => {
   return new Promise((resolve, reject) => {
     switch (scene) {
       case 0:
-        ElapsedTelescope(date, moment(date).add(12, "hours"), 480)
-          .then((...args) => resolve(...args))
+        ElapsedTelescope({
+          start: date,
+          end: moment(date).add(12, "hours"),
+          frames: 240,
+          labelMoons: true,
+          labelTime: true,
+        }).then((...args) => resolve(...args))
           .catch(reject);
         break;
       case 1:
-        Closeup(date, moment(date).add(12, "hours"), 480)
-          .then((...args) => resolve(...args))
+        Closeup({
+          start: date,
+          end: moment(date).add(12, "hours"),
+          frames: 480,
+          labelMoons: true,
+          labelTime: true,
+        }).then((...args) => resolve(...args))
           .catch(reject);
         break;
       case 2:
@@ -39,3 +50,4 @@ const render = () => {
 
 // module.exports = render;
 render();
+

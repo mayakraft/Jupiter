@@ -35,7 +35,7 @@ const RealisticTelescope = (date, options = {}) => {
       ? front.appendChild(g)
       : back.appendChild(g));
 
-  if (options.labels) {
+  if (options.labelMoons) {
     chart.map((moon, i) => svg
       .text(moon.name.toUpperCase(), moon.x, moon.y - 1 - i)
       .fill("white")
@@ -44,7 +44,7 @@ const RealisticTelescope = (date, options = {}) => {
       .fontSize("0.8px"));
   }
 
-  if (options.time) {
+  if (options.labelTime) {
     const time = moment(date).utc().format("h:mm a");
     svg.text(time, viewbox[0] + viewbox[2] / 2, viewbox[1] + viewbox[3])
       .fill("#aaa")

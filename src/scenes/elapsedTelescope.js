@@ -5,16 +5,19 @@ const Ephemeris = require("../ephemeris/moons");
 const RealisticTelescope = require("../draw/realisticTelescope");
 
 const makeTweetText = (startDate, endDate) => {
-  const day = moment(startDate).utc().format("dddd");
-  const start = moment(startDate).utc().format("h:mm a");
-  const end = moment(endDate).utc().format("h:mm a");
-  const hours = moment.duration(moment(endDate).diff(moment(startDate))).asHours();
-  return `Jupiter for the next ${hours} hours (${start} - ${end} UTC+0)`;
-  // return `Jupiter, Friday February 5, for 24 hours (UTC)`;
+  const day = startDate.format("dddd");
+  const start = startDate.format("h:mm a");
+  const end = endDate.format("h:mm a");
+  const month = startDate.format("MMMM");
+  const monthDay = startDate.format("DD");
+  const hours = moment.duration(endDate.diff(startDate)).asHours();
+  return `Jupiter, view from Earth, the next ${hours} hours (${start} - ${end} UTC)`;
+  // return `Jupiter, view from Earth, ${day} ${month} ${monthDay}, for 24 hours (UTC)`;
 };
 
-const Scene = (startDate, endDate, frames) => {
-  const dates = dateSequence(startDate, endDate, frames);
+const Scene = function ({ start, end, frames }) {
+  if (!frames) { frames = 240; }
+  const dates = dateSequence(start, end, frames);
   const max = dates
     .map(date => Ephemeris(date)
       .map(el => el.x)
@@ -26,10 +29,10 @@ const Scene = (startDate, endDate, frames) => {
   const viewbox = [-max, -max/2, max*2, max];
 
   return new Promise((resolve, reject) => {
-    const svgs = dates.map(date => RealisticTelescope(date, { viewbox }));
+    const svgs = dates.map(date => RealisticTelescope(date, { ...arguments[0], viewbox }));
     SVGsToVideo(svgs, [1200, 600])
       .then((videoPath) => resolve({
-        text: makeTweetText(startDate, endDate),
+        text: makeTweetText(start, end),
         media: videoPath,
       }))
       .catch(reject);

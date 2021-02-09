@@ -7,12 +7,14 @@ const Jupiter = require("../draw/jupiter");
 const Roto = require("../draw/roto");
 
 const makeTweetText = (startDate, endDate) => {
-  const day = moment(startDate).utc().format("dddd");
-  const start = moment(startDate).utc().format("h:mm a");
-  const end = moment(endDate).utc().format("h:mm a");
-  const hours = moment.duration(moment(endDate).diff(moment(startDate))).asHours();
+  const day = startDate.format("dddd");
+  const start = startDate.format("h:mm a");
+  const end = endDate.format("h:mm a");
+  const month = startDate.format("MMMM");
+  const monthDay = startDate.format("DD");
+  const hours = moment.duration(endDate.diff(startDate)).asHours();
   // return `Jupiter (with Io, Europa, Ganymede) now for the next ${hours} hours (${start} - ${end} UTC+0)`;
-  return `Jupiter now for the next ${hours} hours (${start} - ${end} UTC+0)`;
+  return `Jupiter now for the next ${hours} hours (${start} - ${end} UTC)`;
 };
 
 // @param {object} date is a Moment.js object
@@ -40,13 +42,13 @@ const TelescopeJupiter = (date, options = {}) => {
   return svg.save();
 };
 
-const Scene = function (startDate, endDate, frames) {
-  const dates = dateSequence(startDate, endDate, frames);
+const Scene = function ({ start, end, frames }) {
+  const dates = dateSequence(start, end, frames);
   return new Promise((resolve, reject) => {
     const svgs = dates.map((date, i) => TelescopeJupiter(date));
     SVGsToVideo(svgs, [800, 800])
       .then((videoPath) => resolve({
-        text: makeTweetText(startDate, endDate),
+        text: makeTweetText(start, end),
         media: videoPath,
       }))
       .catch(reject);
